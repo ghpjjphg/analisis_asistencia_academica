@@ -96,113 +96,87 @@ elif menu == "📊 Panel Analítico":
     conn.close()
 
     # =========================
-    # KPIs GENERALES
+    # KPIs
     # =========================
-    st.subheader("📌 Indicadores Generales")
-
     col1, col2, col3 = st.columns(3)
 
-    col1.metric("👥 Total Estudiantes", df.shape[0])
+    col1.metric("👥 Total", df.shape[0])
     col2.metric("📊 Promedio Asistencia", round(df["total_asistencias"].mean(), 1))
     col3.metric("🎂 Edad Promedio", round(df["edad"].mean(), 1))
 
     st.divider()
 
     # =========================
-    # RELACIÓN EDAD VS ASISTENCIA
+    # GRÁFICOS SUPERIORES (2 EN FILA)
     # =========================
-    st.subheader("📈 Relación entre Edad y Asistencias")
+    colA, colB = st.columns(2)
 
-    fig1, ax1 = plt.subplots()
-    sns.scatterplot(data=df, x="edad", y="total_asistencias")
-    st.pyplot(fig1)
+    with colA:
+        st.subheader("📈 Edad vs Asistencia")
+        fig1, ax1 = plt.subplots(figsize=(5,3))
+        sns.scatterplot(data=df, x="edad", y="total_asistencias", ax=ax1)
+        st.pyplot(fig1)
+
+    with colB:
+        st.subheader("🏆 Top 10 Mayor Asistencia")
+        top10 = df.sort_values(by="total_asistencias", ascending=False).head(10)
+        fig2, ax2 = plt.subplots(figsize=(5,3))
+        sns.barplot(data=top10, x="total_asistencias", y="nombre", ax=ax2)
+        st.pyplot(fig2)
 
     st.divider()
 
     # =========================
-    # TOP 10 QUE MÁS ASISTEN
+    # TOP 10 MENOR ASISTENCIA
     # =========================
-    st.subheader("🏆 Estudiantes que MÁS asisten y su edad")
-
-    top10 = df.sort_values(by="total_asistencias", ascending=False).head(10)
-
-    fig2, ax2 = plt.subplots()
-    sns.barplot(data=top10, x="total_asistencias", y="nombre")
-    st.pyplot(fig2)
-
-    st.dataframe(top10[["nombre", "edad", "total_asistencias"]])
-
-    st.divider()
-
-    # =========================
-    # TOP 10 QUE MENOS ASISTEN
-    # =========================
-    st.subheader("⚠️ Estudiantes que MENOS asisten y su edad")
+    st.subheader("⚠️ Top 10 Menor Asistencia")
 
     bottom10 = df.sort_values(by="total_asistencias", ascending=True).head(10)
 
-    fig3, ax3 = plt.subplots()
-    sns.barplot(data=bottom10, x="total_asistencias", y="nombre")
+    fig3, ax3 = plt.subplots(figsize=(6,3))
+    sns.barplot(data=bottom10, x="total_asistencias", y="nombre", ax=ax3)
     st.pyplot(fig3)
 
-    st.dataframe(bottom10[["nombre", "edad", "total_asistencias"]])
-    
     st.divider()
 
     # =========================
-    # CONSULTA INDIVIDUAL DE ASISTENCIAS
+    # CONSULTA INDIVIDUAL
     # =========================
-    st.subheader("🔎 Consultar Asistencias por Estudiante")
+    st.subheader("🔎 Asistencias por Estudiante")
 
     estudiante_sel = st.selectbox(
         "Selecciona un estudiante",
         df["nombre"]
     )
 
-    # Obtener ID del estudiante seleccionado
     id_est = df[df["nombre"] == estudiante_sel]["id_estudiante"].values[0]
 
-    # Nueva conexión para consulta individual
     conn = get_connection()
 
-    asistencias_individual = pd.read_sql(f"""
-        SELECT 
-            Id_asistencia,
-            Fecha
+    asistencias_individual = pd.read_sql("""
+        SELECT Fecha
         FROM asistencias
-        WHERE Id_estudiante = {id_est}
+        WHERE Id_estudiante = %s
         ORDER BY Fecha
-    """, conn)
+    """, conn, params=(id_est,))
 
     conn.close()
 
-    st.write(f"📊 Total de asistencias: {asistencias_individual.shape[0]}")
-
-    st.dataframe(asistencias_individual)
     # =========================
-    # CONTEO DE ASISTENCIAS POR MES
+    # CONTEO POR MES (SOLO GRÁFICO)
     # =========================
-    st.subheader("📆 Conteo de Asistencias por Mes")
-    
-    # Convertir a fecha si no lo está
     asistencias_individual["Fecha"] = pd.to_datetime(asistencias_individual["Fecha"])
-    
-    # Crear columna Año-Mes
     asistencias_individual["Año-Mes"] = asistencias_individual["Fecha"].dt.to_period("M")
-    
-    # Agrupar por mes
+
     conteo_mensual = asistencias_individual.groupby("Año-Mes").size().reset_index(name="Total")
-    
-    # Convertir a string para graficar
     conteo_mensual["Año-Mes"] = conteo_mensual["Año-Mes"].astype(str)
-    
-    # Gráfico
-    fig_mes, ax_mes = plt.subplots()
-    sns.lineplot(data=conteo_mensual, x="Año-Mes", y="Total", marker="o")
+
+    st.subheader("📆 Tendencia Mensual")
+
+    fig_mes, ax_mes = plt.subplots(figsize=(6,3))
+    sns.lineplot(data=conteo_mensual, x="Año-Mes", y="Total", marker="o", ax=ax_mes)
     plt.xticks(rotation=45)
     st.pyplot(fig_mes)
-    
-    st.dataframe(conteo_mensual)
 # =====================================================
 # 📚 DOCUMENTACIÓN
 # =====================================================
