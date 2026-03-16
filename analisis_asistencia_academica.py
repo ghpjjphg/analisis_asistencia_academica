@@ -120,7 +120,7 @@ elif menu == "📊 Panel Analítico":
         e.Primer_nombre,
         e.Primer_apellido,
         e.Edad,
-        c.nombre_carrera
+        c.Nombre
 """, conn)
 
     # =====================================================
