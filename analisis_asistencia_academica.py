@@ -168,7 +168,7 @@ elif menu == "📊 Panel Analítico":
     
         cursor.execute(query, (int(id_est),))
         rows = cursor.fetchall()
-        st.metric("📌 Total asistencias", total_asistencias_ind)
+       
         asistencias_individual = pd.DataFrame(rows, columns=["Fecha"])
     
         asistencias_individual["Fecha"] = pd.to_datetime(asistencias_individual["Fecha"])
@@ -178,7 +178,7 @@ elif menu == "📊 Panel Analítico":
         conteo_mensual["Año-Mes"] = conteo_mensual["Año-Mes"].astype(str)
     
         total_asistencias_ind = len(asistencias_individual)
-    
+        st.metric("📌 Total asistencias", total_asistencias_ind)
         fig_mes, ax_mes = plt.subplots(figsize=(5,2.5))
         sns.lineplot(data=conteo_mensual, x="Año-Mes", y="Total", marker="o", ax=ax_mes)
         plt.xticks(rotation=45)
