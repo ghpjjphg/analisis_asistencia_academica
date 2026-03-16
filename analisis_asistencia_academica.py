@@ -153,6 +153,7 @@ elif menu == "📊 Panel Analítico":
 
     conn = get_connection()
     st.write(conn.is_connected())
+    st.write(pd.read_sql("SHOW TABLES", conn))
     asistencias_individual = pd.read_sql("""
     SELECT Fecha
     FROM asistencias
