@@ -170,16 +170,20 @@ elif menu == "📊 Panel Analítico":
     # =========================
     asistencias_individual["Fecha"] = pd.to_datetime(asistencias_individual["Fecha"])
     asistencias_individual["Año-Mes"] = asistencias_individual["Fecha"].dt.to_period("M")
-
+    
     conteo_mensual = asistencias_individual.groupby("Año-Mes").size().reset_index(name="Total")
     conteo_mensual["Año-Mes"] = conteo_mensual["Año-Mes"].astype(str)
-
+    
+    total_asistencias_ind = len(asistencias_individual)
+    
     st.subheader("📆 Tendencia Mensual")
-
-    fig_mes, ax_mes = plt.subplots(figsize=(6,3))
+    
+    fig_mes, ax_mes = plt.subplots(figsize=(5,2.5))
     sns.lineplot(data=conteo_mensual, x="Año-Mes", y="Total", marker="o", ax=ax_mes)
     plt.xticks(rotation=45)
     st.pyplot(fig_mes)
+    
+    st.metric("📌 Total de asistencias del estudiante", total_asistencias_ind)
 # =====================================================
 # 📚 DOCUMENTACIÓN
 # =====================================================
