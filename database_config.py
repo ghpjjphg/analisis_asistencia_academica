@@ -1,9 +1,10 @@
+import os
 import mysql.connector
 
-def get_connection():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="asistencia_carreras"
-    )
+conn = mysql.connector.connect(
+    host=os.getenv("ballast.proxy.rlwy.net"),
+    port=int(os.getenv("28843")),
+    user=os.getenv("root"),
+    password=os.getenv("ftkwrcyxjPORSuENUHimDvgtOYOvyJlu"),
+    database=os.getenv("railway")
+)
