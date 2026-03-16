@@ -171,7 +171,7 @@ elif menu == "📊 Panel Analítico":
             Fecha
         FROM asistencias
         WHERE Id_estudiante = {id_est}
-        ORDER BY Fecha_asistencia
+        ORDER BY Fecha
     """, conn)
 
     conn.close()
