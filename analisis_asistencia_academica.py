@@ -16,14 +16,32 @@ st.set_page_config(
 st.markdown("""
 <style>
 .main {
-    background-color: #F1F5F9;
+    background-color: #F8FAFC;
 }
-h1, h2, h3 {
-    color: #1E3A8A;
+
+h1 {
+    color: #0F172A;
+    font-weight: 700;
 }
+
+h2, h3 {
+    color: #1E293B;
+}
+
+section[data-testid="stSidebar"] {
+    background-color: #0F172A;
+    color: white;
+}
+
+.stMetric {
+    background-color: #FFFFFF;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.05);
+}
+
 </style>
 """, unsafe_allow_html=True)
-
 # ---------------- MENÚ LATERAL ----------------
 
 menu = st.sidebar.radio(
@@ -76,130 +94,156 @@ elif menu == "📊 Panel Analítico":
 
     st.title("📊 Panel Analítico")
 
-    # =========================
-    # CONEXIÓN
-    # =========================
     conn = get_connection()
 
+    # =====================================================
+    # DATA GENERAL CON RELACIONES
+    # =====================================================
     df = pd.read_sql("""
         SELECT 
             e.id_estudiante,
             CONCAT(e.Primer_nombre,' ',e.Primer_apellido) as nombre,
             e.edad,
+            c.nombre_carrera,
             COUNT(a.Id_asistencia) as total_asistencias
         FROM estudiantes e
+        INNER JOIN estudiantes_carreras ec
+            ON e.id_estudiante = ec.id_estudiante
+        INNER JOIN carreras c
+            ON ec.id_carrera = c.id_carrera
         LEFT JOIN asistencias a
             ON e.id_estudiante = a.Id_estudiante
         GROUP BY e.id_estudiante
     """, conn)
 
-    conn.close()
+    # =====================================================
+    # 🎛 FILTROS GLOBALES (SIDEBAR)
+    # =====================================================
+    st.sidebar.subheader("🎛 Filtros Globales")
 
-    # =========================
-    # KPIs SUPERIORES
-    # =========================
+    # Filtro carrera
+    carreras = ["Todas"] + sorted(df["nombre_carrera"].unique().tolist())
+    carrera_sel = st.sidebar.selectbox("Filtrar por Carrera", carreras)
+
+    # Filtro edad
+    edad_min, edad_max = st.sidebar.slider(
+        "Rango de Edad",
+        int(df["edad"].min()),
+        int(df["edad"].max()),
+        (int(df["edad"].min()), int(df["edad"].max()))
+    )
+
+    # Filtro mínimo asistencia
+    min_asistencia = st.sidebar.slider(
+        "Mínimo de Asistencias",
+        0,
+        int(df["total_asistencias"].max()),
+        0
+    )
+
+    # =====================================================
+    # APLICAR FILTROS
+    # =====================================================
+    df_filtrado = df.copy()
+
+    if carrera_sel != "Todas":
+        df_filtrado = df_filtrado[df_filtrado["nombre_carrera"] == carrera_sel]
+
+    df_filtrado = df_filtrado[
+        (df_filtrado["edad"] >= edad_min) &
+        (df_filtrado["edad"] <= edad_max) &
+        (df_filtrado["total_asistencias"] >= min_asistencia)
+    ]
+
+    # =====================================================
+    # KPIs
+    # =====================================================
     col1, col2, col3 = st.columns(3)
 
-    col1.metric("👥 Total Estudiantes", df.shape[0])
-    col2.metric("📊 Promedio Asistencia", round(df["total_asistencias"].mean(), 1))
-    col3.metric("🎂 Edad Promedio", round(df["edad"].mean(), 1))
+    col1.metric("👥 Estudiantes Filtrados", df_filtrado.shape[0])
+    col2.metric("📊 Promedio Asistencia", round(df_filtrado["total_asistencias"].mean(), 1) if not df_filtrado.empty else 0)
+    col3.metric("🎂 Edad Promedio", round(df_filtrado["edad"].mean(), 1) if not df_filtrado.empty else 0)
 
     st.divider()
 
     # =====================================================
-    # 🔝 FILA SUPERIOR
+    # 🔝 GRÁFICOS SUPERIORES
     # =====================================================
-    col_top_left, col_top_right = st.columns(2)
+    colA, colB, colC = st.columns(3)
 
-    # --------- Edad vs Asistencia
-    with col_top_left:
+    with colA:
         st.subheader("📈 Edad vs Asistencia")
-
-        fig1, ax1 = plt.subplots(figsize=(6,4))
-        sns.scatterplot(data=df, x="edad", y="total_asistencias", ax=ax1)
-        ax1.set_xlabel("Edad")
-        ax1.set_ylabel("Total Asistencias")
+        fig1, ax1 = plt.subplots(figsize=(5,4))
+        sns.scatterplot(data=df_filtrado, x="edad", y="total_asistencias", ax=ax1)
         st.pyplot(fig1)
 
-    # --------- Asistencia por estudiante
-    with col_top_right:
-        st.subheader("🔎 Asistencia por Estudiante")
+    with colB:
+        st.subheader("🏆 Top 10 Mayor")
+        top10 = df_filtrado.sort_values(by="total_asistencias", ascending=False).head(10)
+        fig2, ax2 = plt.subplots(figsize=(5,4))
+        sns.barplot(data=top10, x="total_asistencias", y="nombre", ax=ax2)
+        st.pyplot(fig2)
 
-        estudiante_sel = st.selectbox(
-            "Selecciona un estudiante",
-            df["nombre"]
-        )
-
-        id_est = df[df["nombre"] == estudiante_sel]["id_estudiante"].values[0]
-
-        conn = get_connection()
-        cursor = conn.cursor()
-
-        query = """
-            SELECT Fecha
-            FROM asistencias
-            WHERE Id_estudiante = %s
-            ORDER BY Fecha
-        """
-
-        cursor.execute(query, (int(id_est),))
-        rows = cursor.fetchall()
-        conn.close()
-
-        asistencias_individual = pd.DataFrame(rows, columns=["Fecha"])
-
-        if not asistencias_individual.empty:
-
-            asistencias_individual["Fecha"] = pd.to_datetime(asistencias_individual["Fecha"])
-            asistencias_individual["Año-Mes"] = asistencias_individual["Fecha"].dt.to_period("M")
-
-            conteo_mensual = asistencias_individual.groupby("Año-Mes").size().reset_index(name="Total")
-            conteo_mensual["Año-Mes"] = conteo_mensual["Año-Mes"].astype(str)
-            
-            st.metric("📌 Total Asistencias", len(asistencias_individual))
-
-        else:
-            st.warning("Este estudiante no tiene asistencias registradas.")
-            
-        fig_mes, ax_mes = plt.subplots(figsize=(6,4))
-        sns.lineplot(data=conteo_mensual, x="Año-Mes", y="Total", marker="o", ax=ax_mes)
-        plt.xticks(rotation=45)
-        ax_mes.set_xlabel("Año-Mes")
-        ax_mes.set_ylabel("Total mensual")
-        st.pyplot(fig_mes)
-
-            
+    with colC:
+        st.subheader("⚠️ Top 10 Menor")
+        bottom10 = df_filtrado.sort_values(by="total_asistencias", ascending=True).head(10)
+        fig3, ax3 = plt.subplots(figsize=(5,4))
+        sns.barplot(data=bottom10, x="total_asistencias", y="nombre", ax=ax3)
+        st.pyplot(fig3)
 
     st.divider()
 
     # =====================================================
-    # 🔽 FILA INFERIOR
+    # 🔽 CONSULTA INDIVIDUAL
     # =====================================================
-    col_bottom_left, col_bottom_right = st.columns(2)
+    col_left, col_right = st.columns(2)
 
-    # --------- Top 10 Mayor Asistencia
-    with col_bottom_left:
-        st.subheader("🏆 Top 10 Mayor Asistencia")
+    with col_left:
 
-        top10 = df.sort_values(by="total_asistencias", ascending=False).head(10)
+        st.subheader("🎓 Promedio por Carrera (Filtrado)")
 
-        fig2, ax2 = plt.subplots(figsize=(6,4))
-        sns.barplot(data=top10, x="total_asistencias", y="nombre", ax=ax2)
-        ax2.set_xlabel("Total Asistencias")
-        ax2.set_ylabel("Estudiante")
-        st.pyplot(fig2)
+        promedio_carrera = df_filtrado.groupby("nombre_carrera")["total_asistencias"].mean().reset_index()
 
-    # --------- Top 10 Menor Asistencia
-    with col_bottom_right:
-        st.subheader("⚠️ Top 10 Menor Asistencia")
+        fig_carr, ax_carr = plt.subplots(figsize=(6,4))
+        sns.barplot(data=promedio_carrera, x="total_asistencias", y="nombre_carrera", ax=ax_carr)
+        st.pyplot(fig_carr)
 
-        bottom10 = df.sort_values(by="total_asistencias", ascending=True).head(10)
+    with col_right:
 
-        fig3, ax3 = plt.subplots(figsize=(6,4))
-        sns.barplot(data=bottom10, x="total_asistencias", y="nombre", ax=ax3)
-        ax3.set_xlabel("Total Asistencias")
-        ax3.set_ylabel("Estudiante")
-        st.pyplot(fig3)
+        st.subheader("👤 Asistencia por Estudiante")
+
+        if not df_filtrado.empty:
+
+            estudiante_sel = st.selectbox(
+                "Selecciona un estudiante",
+                df_filtrado["nombre"]
+            )
+
+            id_est = df_filtrado[df_filtrado["nombre"] == estudiante_sel]["id_estudiante"].values[0]
+
+            asistencias_ind = pd.read_sql("""
+                SELECT Fecha
+                FROM asistencias
+                WHERE Id_estudiante = %s
+                ORDER BY Fecha
+            """, conn, params=(int(id_est),))
+
+            if not asistencias_ind.empty:
+
+                asistencias_ind["Fecha"] = pd.to_datetime(asistencias_ind["Fecha"])
+                asistencias_ind["Año-Mes"] = asistencias_ind["Fecha"].dt.to_period("M")
+
+                conteo_mensual = asistencias_ind.groupby("Año-Mes").size().reset_index(name="Total")
+                conteo_mensual["Año-Mes"] = conteo_mensual["Año-Mes"].astype(str)
+
+                fig_est, ax_est = plt.subplots(figsize=(6,4))
+                sns.lineplot(data=conteo_mensual, x="Año-Mes", y="Total", marker="o", ax=ax_est)
+                plt.xticks(rotation=45)
+                st.pyplot(fig_est)
+
+                st.metric("📌 Total Asistencias", len(asistencias_ind))
+
+    conn.close()
 # =====================================================
 # 📚 DOCUMENTACIÓN
 # =====================================================
