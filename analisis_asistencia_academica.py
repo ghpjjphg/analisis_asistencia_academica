@@ -155,7 +155,7 @@ elif menu == "📊 Panel Analítico":
 
     asistencias_individual = pd.read_sql("""
         SELECT Fecha
-        FROM asistencias
+        FROM asistencia
         WHERE Id_estudiante = %s
         ORDER BY Fecha
     """, conn, params=(id_est,))
