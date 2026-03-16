@@ -184,9 +184,13 @@ elif menu == "📊 Panel Analítico":
 
     info = df[df["nombre"] == estudiante_sel]
 
-    st.metric("Total Asistencias", int(info["total_asistencias"]))
-    st.metric("Porcentaje de Asistencia", round(info["porcentaje"].values[0], 2))
-    st.metric("Segmento", info["segmento"].values[0])
+    total = int(info["total_asistencias"].values[0])
+    porcentaje = round(info["porcentaje"].values[0], 2)
+    segmento = info["segmento"].values[0]
+
+    st.metric("Total Asistencias", total)
+    st.metric("Porcentaje de Asistencia", porcentaje)
+    st.metric("Segmento", segmento)
 
 # =====================================================
 # 📚 DOCUMENTACIÓN
