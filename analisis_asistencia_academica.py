@@ -2,9 +2,8 @@ import streamlit as st
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-import mysql.connector
 from PIL import Image
-
+from database import get_connection
 # ---------------- CONFIGURACIÓN ----------------
 
 st.set_page_config(
@@ -24,16 +23,6 @@ h1, h2, h3 {
 }
 </style>
 """, unsafe_allow_html=True)
-
-# ---------------- CONEXIÓN ----------------
-
-def get_connection():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="TU_PASSWORD",
-        database="TU_BASE"
-    )
 
 # ---------------- MENÚ LATERAL ----------------
 
