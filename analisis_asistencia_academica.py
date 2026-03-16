@@ -164,7 +164,7 @@ elif menu == "📊 Panel Analítico":
     cursor.execute(query, (int(id_est),))
     rows = cursor.fetchall()
     asistencias_individual = pd.DataFrame(rows, columns=["Fecha"])
-
+   
     # =========================
     # CONTEO POR MES (SOLO GRÁFICO)
     # =========================
@@ -175,7 +175,7 @@ elif menu == "📊 Panel Analítico":
     conteo_mensual["Año-Mes"] = conteo_mensual["Año-Mes"].astype(str)
     
     total_asistencias_ind = len(asistencias_individual)
-    
+    st.metric("📌 Total de asistencias del estudiante", total_asistencias_ind)
     st.subheader("📆 Tendencia Mensual")
     
     fig_mes, ax_mes = plt.subplots(figsize=(5,2.5))
@@ -183,7 +183,7 @@ elif menu == "📊 Panel Analítico":
     plt.xticks(rotation=45)
     st.pyplot(fig_mes)
     
-    st.metric("📌 Total de asistencias del estudiante", total_asistencias_ind)
+    
 # =====================================================
 # 📚 DOCUMENTACIÓN
 # =====================================================
