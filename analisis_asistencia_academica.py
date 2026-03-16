@@ -105,7 +105,7 @@ elif menu == "📊 Panel Analítico":
     SELECT 
         e.id_estudiante,
         CONCAT(e.Primer_nombre,' ',e.Primer_apellido) as nombre,
-        e.Edad,
+        e.Edad AS edad,
         c.Nombre AS nombre_carrera,
         COUNT(a.Id_asistencia) as total_asistencias
     FROM estudiantes e
