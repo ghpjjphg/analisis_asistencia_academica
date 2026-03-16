@@ -95,9 +95,6 @@ elif menu == "📊 Panel Analítico":
     st.title("📊 Panel Analítico")
 
     conn = get_connection()
-    st.write(pd.read_sql("DESCRIBE estudiantes", conn))
-    st.write(pd.read_sql("DESCRIBE carreras", conn))
-    st.write(pd.read_sql("DESCRIBE asistencias", conn))
     # =====================================================
     # DATA GENERAL CON RELACIONES
     # =====================================================
