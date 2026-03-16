@@ -71,7 +71,7 @@ if menu == "🏠 Inicio":
 # 📊 PANEL ANALÍTICO
 # =====================================================
 
-elif menu == "📊 Panel Analítico":
+
 
     elif menu == "📊 Panel Analítico":
 
