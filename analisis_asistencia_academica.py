@@ -129,62 +129,62 @@ elif menu == "📊 Panel Analítico":
     # =========================
     # TOP 10 MENOR ASISTENCIA
     # =========================
-   # =========================
-# SECCIÓN EN DOS COLUMNAS
-# =========================
-col_left, col_right = st.columns(2)
-
-# --------- COLUMNA IZQUIERDA (Bottom 10)
-with col_left:
-    st.subheader("⚠️ Top 10 Menor Asistencia")
-
-    bottom10 = df.sort_values(by="total_asistencias", ascending=True).head(10)
-
-    fig3, ax3 = plt.subplots(figsize=(5,3))
-    sns.barplot(data=bottom10, x="total_asistencias", y="nombre", ax=ax3)
-    st.pyplot(fig3)
-
-
-# --------- COLUMNA DERECHA (Consulta individual)
-with col_right:
-    st.subheader("🔎 Asistencias por Estudiante")
-
-    estudiante_sel = st.selectbox(
-        "Selecciona un estudiante",
-        df["nombre"]
-    )
-
-    id_est = df[df["nombre"] == estudiante_sel]["id_estudiante"].values[0]
-
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    query = """
-    SELECT Fecha
-    FROM asistencias
-    WHERE Id_estudiante = %s
-    ORDER BY Fecha
-    """
-
-    cursor.execute(query, (int(id_est),))
-    rows = cursor.fetchall()
-    asistencias_individual = pd.DataFrame(rows, columns=["Fecha"])
-
-    asistencias_individual["Fecha"] = pd.to_datetime(asistencias_individual["Fecha"])
-    asistencias_individual["Año-Mes"] = asistencias_individual["Fecha"].dt.to_period("M")
-
-    conteo_mensual = asistencias_individual.groupby("Año-Mes").size().reset_index(name="Total")
-    conteo_mensual["Año-Mes"] = conteo_mensual["Año-Mes"].astype(str)
-
-    total_asistencias_ind = len(asistencias_individual)
-
-    fig_mes, ax_mes = plt.subplots(figsize=(5,2.5))
-    sns.lineplot(data=conteo_mensual, x="Año-Mes", y="Total", marker="o", ax=ax_mes)
-    plt.xticks(rotation=45)
-    st.pyplot(fig_mes)
-
-    st.metric("📌 Total asistencias", total_asistencias_ind)
+    # =========================
+    # SECCIÓN EN DOS COLUMNAS
+    # =========================
+    col_left, col_right = st.columns(2)
     
+    # --------- COLUMNA IZQUIERDA (Bottom 10)
+    with col_left:
+        st.subheader("⚠️ Top 10 Menor Asistencia")
+    
+        bottom10 = df.sort_values(by="total_asistencias", ascending=True).head(10)
+    
+        fig3, ax3 = plt.subplots(figsize=(5,3))
+        sns.barplot(data=bottom10, x="total_asistencias", y="nombre", ax=ax3)
+        st.pyplot(fig3)
+    
+    
+    # --------- COLUMNA DERECHA (Consulta individual)
+    with col_right:
+        st.subheader("🔎 Asistencias por Estudiante")
+    
+        estudiante_sel = st.selectbox(
+            "Selecciona un estudiante",
+            df["nombre"]
+        )
+    
+        id_est = df[df["nombre"] == estudiante_sel]["id_estudiante"].values[0]
+    
+        conn = get_connection()
+        cursor = conn.cursor()
+    
+        query = """
+        SELECT Fecha
+        FROM asistencias
+        WHERE Id_estudiante = %s
+        ORDER BY Fecha
+        """
+    
+        cursor.execute(query, (int(id_est),))
+        rows = cursor.fetchall()
+        asistencias_individual = pd.DataFrame(rows, columns=["Fecha"])
+    
+        asistencias_individual["Fecha"] = pd.to_datetime(asistencias_individual["Fecha"])
+        asistencias_individual["Año-Mes"] = asistencias_individual["Fecha"].dt.to_period("M")
+    
+        conteo_mensual = asistencias_individual.groupby("Año-Mes").size().reset_index(name="Total")
+        conteo_mensual["Año-Mes"] = conteo_mensual["Año-Mes"].astype(str)
+    
+        total_asistencias_ind = len(asistencias_individual)
+    
+        fig_mes, ax_mes = plt.subplots(figsize=(5,2.5))
+        sns.lineplot(data=conteo_mensual, x="Año-Mes", y="Total", marker="o", ax=ax_mes)
+        plt.xticks(rotation=45)
+        st.pyplot(fig_mes)
+    
+        st.metric("📌 Total asistencias", total_asistencias_ind)
+        
     
 # =====================================================
 # 📚 DOCUMENTACIÓN
