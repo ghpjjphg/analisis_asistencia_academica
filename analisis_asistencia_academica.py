@@ -132,7 +132,7 @@ elif menu == "📊 Panel Analítico":
     # =========================
     # SECCIÓN EN DOS COLUMNAS
     # =========================
-    col_left, col_right = st.columns(2)
+    col_left, col_right = st.columns([4,6])
     
     # --------- COLUMNA IZQUIERDA (Bottom 10)
     with col_left:
