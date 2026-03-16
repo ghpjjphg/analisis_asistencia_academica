@@ -180,29 +180,29 @@ elif menu == "📊 Panel Analítico":
 
     st.dataframe(asistencias_individual)
     # =========================
-# CONTEO DE ASISTENCIAS POR MES
-# =========================
-st.subheader("📆 Conteo de Asistencias por Mes")
-
-# Convertir a fecha si no lo está
-asistencias_individual["Fecha"] = pd.to_datetime(asistencias_individual["Fecha"])
-
-# Crear columna Año-Mes
-asistencias_individual["Año-Mes"] = asistencias_individual["Fecha"].dt.to_period("M")
-
-# Agrupar por mes
-conteo_mensual = asistencias_individual.groupby("Año-Mes").size().reset_index(name="Total")
-
-# Convertir a string para graficar
-conteo_mensual["Año-Mes"] = conteo_mensual["Año-Mes"].astype(str)
-
-# Gráfico
-fig_mes, ax_mes = plt.subplots()
-sns.lineplot(data=conteo_mensual, x="Año-Mes", y="Total", marker="o")
-plt.xticks(rotation=45)
-st.pyplot(fig_mes)
-
-st.dataframe(conteo_mensual)
+    # CONTEO DE ASISTENCIAS POR MES
+    # =========================
+    st.subheader("📆 Conteo de Asistencias por Mes")
+    
+    # Convertir a fecha si no lo está
+    asistencias_individual["Fecha"] = pd.to_datetime(asistencias_individual["Fecha"])
+    
+    # Crear columna Año-Mes
+    asistencias_individual["Año-Mes"] = asistencias_individual["Fecha"].dt.to_period("M")
+    
+    # Agrupar por mes
+    conteo_mensual = asistencias_individual.groupby("Año-Mes").size().reset_index(name="Total")
+    
+    # Convertir a string para graficar
+    conteo_mensual["Año-Mes"] = conteo_mensual["Año-Mes"].astype(str)
+    
+    # Gráfico
+    fig_mes, ax_mes = plt.subplots()
+    sns.lineplot(data=conteo_mensual, x="Año-Mes", y="Total", marker="o")
+    plt.xticks(rotation=45)
+    st.pyplot(fig_mes)
+    
+    st.dataframe(conteo_mensual)
 # =====================================================
 # 📚 DOCUMENTACIÓN
 # =====================================================
