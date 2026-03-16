@@ -146,7 +146,39 @@ elif menu == "📊 Panel Analítico":
     st.pyplot(fig3)
 
     st.dataframe(bottom10[["nombre", "edad", "total_asistencias"]])
+    
+    st.divider()
 
+    # =========================
+    # CONSULTA INDIVIDUAL DE ASISTENCIAS
+    # =========================
+    st.subheader("🔎 Consultar Asistencias por Estudiante")
+
+    estudiante_sel = st.selectbox(
+        "Selecciona un estudiante",
+        df["nombre"]
+    )
+
+    # Obtener ID del estudiante seleccionado
+    id_est = df[df["nombre"] == estudiante_sel]["id_estudiante"].values[0]
+
+    # Nueva conexión para consulta individual
+    conn = get_connection()
+
+    asistencias_individual = pd.read_sql(f"""
+        SELECT 
+            Id_asistencia,
+            Fecha_asistencia
+        FROM asistencias
+        WHERE Id_estudiante = {id_est}
+        ORDER BY Fecha_asistencia
+    """, conn)
+
+    conn.close()
+
+    st.write(f"📊 Total de asistencias: {asistencias_individual.shape[0]}")
+
+    st.dataframe(asistencias_individual)
 # =====================================================
 # 📚 DOCUMENTACIÓN
 # =====================================================
