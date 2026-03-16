@@ -73,50 +73,121 @@ if menu == "🏠 Inicio":
 
 elif menu == "📊 Panel Analítico":
 
-    st.title("📊 Panel de Análisis")
+    elif menu == "📊 Panel Analítico":
 
+    st.title("📊 Panel Analítico Avanzado")
+
+    # =========================
+    # CONEXIÓN
+    # =========================
     conn = get_connection()
 
     df = pd.read_sql("""
     SELECT 
-    e.id_estudiante,
-    CONCAT(e.Primer_nombre,' ',e.Primer_apellido) as nombre,
-    COUNT(a.Id_asistencia) as total_asistencias
+        e.id_estudiante,
+        CONCAT(e.Primer_nombre,' ',e.Primer_apellido) as nombre,
+        COUNT(a.Id_asistencia) as total_asistencias
     FROM estudiantes e
     LEFT JOIN asistencias a
-    ON e.id_estudiante = a.Id_estudiante
+        ON e.id_estudiante = a.Id_estudiante
     GROUP BY e.id_estudiante
     """, conn)
 
     conn.close()
 
-    st.subheader("📌 Distribución de Asistencias")
-    with st.expander("❓ ¿Qué muestra este gráfico?"):
-        st.write("Permite visualizar cómo se distribuyen las asistencias entre los estudiantes.")
+    # =========================
+    # KPIs GENERALES
+    # =========================
+    st.subheader("📌 Indicadores Generales")
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    total_estudiantes = df["id_estudiante"].nunique()
+    promedio_asistencia = df["total_asistencias"].mean()
+    max_asistencia = df["total_asistencias"].max()
+    min_asistencia = df["total_asistencias"].min()
+
+    col1.metric("👥 Total Estudiantes", total_estudiantes)
+    col2.metric("📊 Promedio Asistencia", round(promedio_asistencia, 1))
+    col3.metric("🏆 Máxima Asistencia", max_asistencia)
+    col4.metric("⚠️ Mínima Asistencia", min_asistencia)
+
+    st.divider()
+
+    # =========================
+    # ANÁLISIS ESTADÍSTICO
+    # =========================
+    st.subheader("📈 Análisis Estadístico")
+
+    col1, col2, col3 = st.columns(3)
+    col1.write("Media:", round(df["total_asistencias"].mean(), 2))
+    col2.write("Mediana:", round(df["total_asistencias"].median(), 2))
+    col3.write("Desviación estándar:", round(df["total_asistencias"].std(), 2))
 
     fig1, ax1 = plt.subplots()
     sns.histplot(df["total_asistencias"], kde=True)
     st.pyplot(fig1)
 
-    st.subheader("📌 Top 10 Estudiantes con Mayor Asistencia")
-    with st.expander("❓ Explicación"):
-        st.write("Identifica los estudiantes con mayor compromiso académico.")
+    st.divider()
+
+    # =========================
+    # SEGMENTACIÓN DE RIESGO
+    # =========================
+    st.subheader("⚠️ Segmentación de Riesgo Académico")
+
+    df["porcentaje"] = (df["total_asistencias"] / 240) * 100
+
+    def clasificar(x):
+        if x < 70:
+            return "Alto Riesgo"
+        elif x < 85:
+            return "Riesgo Medio"
+        else:
+            return "Bajo Riesgo"
+
+    df["segmento"] = df["porcentaje"].apply(clasificar)
+
+    fig2, ax2 = plt.subplots()
+    sns.countplot(x="segmento", data=df)
+    st.pyplot(fig2)
+
+    porcentaje_riesgo = round((df[df["segmento"] == "Alto Riesgo"].shape[0] / total_estudiantes) * 100, 2)
+
+    if porcentaje_riesgo > 30:
+        st.error(f"⚠️ {porcentaje_riesgo}% de estudiantes están en alto riesgo académico.")
+    else:
+        st.success("✅ El nivel de riesgo académico está bajo control.")
+
+    st.divider()
+
+    # =========================
+    # TOP 10 ESTUDIANTES
+    # =========================
+    st.subheader("🏆 Top 10 Estudiantes con Mayor Asistencia")
 
     top10 = df.sort_values(by="total_asistencias", ascending=False).head(10)
 
-    fig2, ax2 = plt.subplots()
+    fig3, ax3 = plt.subplots()
     sns.barplot(x="total_asistencias", y="nombre", data=top10)
-    st.pyplot(fig2)
+    st.pyplot(fig3)
 
-    st.subheader("📌 Clasificación de Riesgo Académico")
+    st.divider()
 
-    df["riesgo"] = df["total_asistencias"].apply(
-        lambda x: "Alto Riesgo" if x < 200 else "Normal"
+    # =========================
+    # PERFIL INDIVIDUAL
+    # =========================
+    st.subheader("👤 Perfil Individual del Estudiante")
+
+    estudiante_sel = st.selectbox(
+        "Selecciona un estudiante",
+        df["nombre"]
     )
 
-    fig3, ax3 = plt.subplots()
-    sns.countplot(x="riesgo", data=df)
-    st.pyplot(fig3)
+    info = df[df["nombre"] == estudiante_sel]
+
+    st.metric("Total Asistencias", int(info["total_asistencias"]))
+    st.metric("Porcentaje de Asistencia", round(info["porcentaje"].values[0], 2))
+    st.metric("Segmento", info["segmento"].values[0])
 
 # =====================================================
 # 📚 DOCUMENTACIÓN
