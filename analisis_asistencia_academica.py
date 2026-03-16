@@ -100,21 +100,26 @@ elif menu == "📊 Panel Analítico":
     # DATA GENERAL CON RELACIONES
     # =====================================================
     df = pd.read_sql("""
-        SELECT 
-            e.id_estudiante,
-            CONCAT(e.Primer_nombre,' ',e.Primer_apellido) as nombre,
-            e.edad,
-            c.nombre_carrera,
-            COUNT(a.Id_asistencia) as total_asistencias
-        FROM estudiantes e
-        INNER JOIN estudiantes_carreras ec
-            ON e.id_estudiante = ec.id_estudiante
-        INNER JOIN carreras c
-            ON ec.id_carrera = c.id_carrera
-        LEFT JOIN asistencias a
-            ON e.id_estudiante = a.Id_estudiante
-        GROUP BY e.id_estudiante
-    """, conn)
+    SELECT 
+        e.id_estudiante,
+        CONCAT(e.Primer_nombre,' ',e.Primer_apellido) as nombre,
+        e.edad,
+        c.nombre_carrera,
+        COUNT(a.Id_asistencia) as total_asistencias
+    FROM estudiantes e
+    INNER JOIN estudiantes_carreras ec
+        ON e.id_estudiante = ec.id_estudiante
+    INNER JOIN carreras c
+        ON ec.id_carrera = c.id_carrera
+    LEFT JOIN asistencias a
+        ON e.id_estudiante = a.Id_estudiante
+    GROUP BY 
+        e.id_estudiante,
+        e.Primer_nombre,
+        e.Primer_apellido,
+        e.edad,
+        c.nombre_carrera
+""", conn)
 
     # =====================================================
     # 🎛 FILTROS GLOBALES (SIDEBAR)
