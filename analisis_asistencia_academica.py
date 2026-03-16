@@ -106,7 +106,7 @@ elif menu == "📊 Panel Analítico":
         e.id_estudiante,
         CONCAT(e.Primer_nombre,' ',e.Primer_apellido) as nombre,
         e.Edad,
-        c.Nombre_carrera,
+        c.Nombre,
         COUNT(a.Id_asistencia) as total_asistencias
     FROM estudiantes e
     INNER JOIN estudiantes_carreras ec
