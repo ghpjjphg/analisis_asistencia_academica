@@ -105,22 +105,22 @@ elif menu == "📊 Panel Analítico":
     SELECT 
         e.id_estudiante,
         CONCAT(e.Primer_nombre,' ',e.Primer_apellido) as nombre,
-        e.edad,
-        c.nombre_carrera,
+        e.Edad,
+        c.Nombre_carrera,
         COUNT(a.Id_asistencia) as total_asistencias
     FROM estudiantes e
     INNER JOIN estudiantes_carreras ec
-        ON e.id_estudiante = ec.id_estudiante
+        ON e.Id_estudiante = ec.Id_estudiante
     INNER JOIN carreras c
-        ON ec.id_carrera = c.id_carrera
+        ON ec.Id_carrera = c.Id_carrera
     LEFT JOIN asistencias a
-        ON e.id_estudiante = a.Id_estudiante
+        ON e.Id_estudiante = a.Id_estudiante
     GROUP BY 
-        e.id_estudiante,
+        e.Id_estudiante,
         e.Primer_nombre,
         e.Primer_apellido,
-        e.edad,
-        c.nombre_carrera
+        e.Edad,
+        c.Nombre
 """, conn)
 
     # =====================================================
