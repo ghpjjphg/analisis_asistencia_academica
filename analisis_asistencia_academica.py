@@ -118,36 +118,7 @@ elif menu == "📊 Panel Analítico":
         st.pyplot(fig1)
 
     with colB:
-        st.subheader("🏆 Top 10 Mayor Asistencia")
-        top10 = df.sort_values(by="total_asistencias", ascending=False).head(10)
-        fig2, ax2 = plt.subplots(figsize=(5,3))
-        sns.barplot(data=top10, x="total_asistencias", y="nombre", ax=ax2)
-        st.pyplot(fig2)
-
-    st.divider()
-
-    # =========================
-    # TOP 10 MENOR ASISTENCIA
-    # =========================
-    # =========================
-    # SECCIÓN EN DOS COLUMNAS
-    # =========================
-    col_left, col_right = st.columns([5,5])
-    
-    # --------- COLUMNA IZQUIERDA (Bottom 10)
-    with col_left:
-        st.subheader("⚠️ Top 10 Menor Asistencia")
-    
-        bottom10 = df.sort_values(by="total_asistencias", ascending=True).head(10)
-    
-        fig3, ax3 = plt.subplots(figsize=(5,3))
-        sns.barplot(data=bottom10, x="total_asistencias", y="nombre", ax=ax3)
-        st.pyplot(fig3)
-    
-    
-    # --------- COLUMNA DERECHA (Consulta individual)
-    with col_right:
-        st.subheader("🔎 Asistencias por Estudiante")
+       st.subheader("🔎 Asistencias por Estudiante")
     
         estudiante_sel = st.selectbox(
             "Selecciona un estudiante",
@@ -183,10 +154,35 @@ elif menu == "📊 Panel Analítico":
         sns.lineplot(data=conteo_mensual, x="Año-Mes", y="Total", marker="o", ax=ax_mes)
         plt.xticks(rotation=45)
         st.pyplot(fig_mes)
+
+    # =========================
+    # TOP 10 MENOR ASISTENCIA
+    # =========================
+    # =========================
+    # SECCIÓN EN DOS COLUMNAS
+    # =========================
+    col_left, col_right = st.columns([5,5])
     
-        
-        
+    # --------- COLUMNA IZQUIERDA (Bottom 10)
+    with col_left:
+        st.subheader("⚠️ Top 10 Menor Asistencia")
     
+        bottom10 = df.sort_values(by="total_asistencias", ascending=True).head(10)
+    
+        fig3, ax3 = plt.subplots(figsize=(5,3))
+        sns.barplot(data=bottom10, x="total_asistencias", y="nombre", ax=ax3)
+        st.pyplot(fig3)
+    
+    
+    # --------- COLUMNA DERECHA (Consulta individual)
+    with col_right:
+        st.subheader("🏆 Top 10 Mayor Asistencia")
+        top10 = df.sort_values(by="total_asistencias", ascending=False).head(10)
+        fig2, ax2 = plt.subplots(figsize=(5,3))
+        sns.barplot(data=top10, x="total_asistencias", y="nombre", ax=ax2)
+        st.pyplot(fig2)
+
+    st.divider()
 # =====================================================
 # 📚 DOCUMENTACIÓN
 # =====================================================
