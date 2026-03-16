@@ -1,7 +1,7 @@
 streamlit
 pandas
 mysql-connector-python
+python-dotenv
 matplotlib
 seaborn
 plotly
-Pillow
