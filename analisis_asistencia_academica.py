@@ -3,7 +3,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from PIL import Image
-from database import get_connection
+from database_config import get_connection
 # ---------------- CONFIGURACIÓN ----------------
 
 st.set_page_config(
