@@ -152,8 +152,7 @@ elif menu == "📊 Panel Analítico":
     id_est = df[df["nombre"] == estudiante_sel]["id_estudiante"].values[0]
 
     conn = get_connection()
-    st.write("ID seleccionado:", id_est)
-    st.write("Tipo:", type(id_est))
+    st.write(pd.read_sql("DESCRIBE asistencias", conn))
     
     asistencias_individual = pd.read_sql("""
     SELECT Fecha
