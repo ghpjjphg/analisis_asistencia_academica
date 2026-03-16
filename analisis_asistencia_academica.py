@@ -206,31 +206,102 @@ elif menu == "📊 Panel Analítico":
 
 elif menu == "📚 Documentación":
 
-    st.title("📚 Documentación Técnica")
+    st.title("📚 Documentación Técnica del Proyecto")
 
-    tab1, tab2 = st.tabs(["Base de Datos", "Metodología"])
+    tab1, tab2, tab3 = st.tabs(["📦 Base de Datos", "📊 Modelo Analítico", "⚙️ Tecnologías"])
 
+    # =====================================================
+    # BASE DE DATOS
+    # =====================================================
     with tab1:
         st.markdown("""
-        ### Modelo Relacional
+        ## 📦 Modelo Relacional
 
-        - estudiantes
-        - carreras
-        - estudiantes_carreras
-        - asistencias
+        El sistema está basado en un modelo relacional normalizado compuesto por:
 
-        Relaciones:
-        - Un estudiante puede tener múltiples asistencias.
-        - Un estudiante puede estar en múltiples carreras.
+        ### Tablas Principales
+
+        - **estudiantes**
+            - id_estudiante (PK)
+            - Primer_nombre
+            - Primer_apellido
+            - edad
+
+        - **carreras**
+            - id_carrera (PK)
+            - nombre_carrera
+
+        - **estudiantes_carreras**
+            - id_estudiante (FK)
+            - id_carrera (FK)
+
+        - **asistencias**
+            - Id_asistencia (PK)
+            - Fecha
+            - Id_estudiante (FK)
+
+        ### Relaciones
+
+        - Un estudiante puede pertenecer a múltiples carreras.
+        - Un estudiante puede tener múltiples registros de asistencia.
+        - La relación muchos-a-muchos entre estudiantes y carreras se maneja mediante la tabla intermedia `estudiantes_carreras`.
+
+        El modelo permite realizar análisis segmentados por carrera, edad y nivel de asistencia.
         """)
 
+    # =====================================================
+    # MODELO ANALÍTICO
+    # =====================================================
     with tab2:
         st.markdown("""
-        ### Enfoque Analítico
+        ## 📊 Enfoque Analítico
 
-        Se utilizaron consultas agregadas con COUNT y GROUP BY para medir:
+        El dashboard implementa:
 
-        - Promedio de asistencia
-        - Distribución
-        - Segmentación de riesgo
+        ### 🔹 KPIs Principales
+        - Total de estudiantes
+        - Promedio general de asistencia
+        - Edad promedio
+
+        ### 🔹 Análisis Exploratorio
+        - Relación entre edad y asistencia
+        - Identificación de estudiantes con mayor y menor compromiso
+        - Tendencia mensual individual
+
+        ### 🔹 Segmentación Dinámica
+        - Filtros globales por:
+            - Carrera
+            - Rango de edad
+            - Nivel mínimo de asistencia
+
+        ### 🔹 Métricas Derivadas
+        - Promedio de asistencia por carrera
+        - Conteo mensual de asistencias
+        - Ranking de desempeño
+
+        Este enfoque permite detectar patrones de comportamiento académico y posibles riesgos de deserción.
+        """)
+
+    # =====================================================
+    # TECNOLOGÍAS
+    # =====================================================
+    with tab3:
+        st.markdown("""
+        ## ⚙️ Tecnologías Utilizadas
+
+        - **Python 3**
+        - **Streamlit** (Dashboard interactivo)
+        - **MySQL** (Base de datos relacional)
+        - **Pandas** (Manipulación de datos)
+        - **Seaborn & Matplotlib** (Visualización)
+        - **SQL Joins y Agregaciones** (Modelo analítico)
+
+        ## 🏗 Arquitectura
+
+        - Separación de conexión en módulo `database.connection`
+        - Consultas relacionales con INNER JOIN y LEFT JOIN
+        - Filtros globales aplicados sobre DataFrame principal
+        - Visualización modular organizada por secciones
+
+        El sistema fue diseñado siguiendo buenas prácticas de análisis de datos y visualización ejecutiva.
         """)
