@@ -119,9 +119,9 @@ elif menu == "📊 Panel Analítico":
     st.subheader("📈 Análisis Estadístico")
 
     col1, col2, col3 = st.columns(3)
-    col1.write("Media:", round(df["total_asistencias"].mean(), 2))
-    col2.write("Mediana:", round(df["total_asistencias"].median(), 2))
-    col3.write("Desviación estándar:", round(df["total_asistencias"].std(), 2))
+    col1.write(f"**Media:** {round(df['total_asistencias'].mean(), 2)}")
+    col2.write(f"**Mediana:** {round(df['total_asistencias'].median(), 2)}")
+    col3.write(f"**Desviación estándar:** {round(df['total_asistencias'].std(), 2)}")
 
     fig1, ax1 = plt.subplots()
     sns.histplot(df["total_asistencias"], kde=True)
