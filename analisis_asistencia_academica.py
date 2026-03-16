@@ -168,6 +168,7 @@ elif menu == "📊 Panel Analítico":
     
         cursor.execute(query, (int(id_est),))
         rows = cursor.fetchall()
+        st.metric("📌 Total asistencias", total_asistencias_ind)
         asistencias_individual = pd.DataFrame(rows, columns=["Fecha"])
     
         asistencias_individual["Fecha"] = pd.to_datetime(asistencias_individual["Fecha"])
@@ -183,7 +184,7 @@ elif menu == "📊 Panel Analítico":
         plt.xticks(rotation=45)
         st.pyplot(fig_mes)
     
-        st.metric("📌 Total asistencias", total_asistencias_ind)
+        
         
     
 # =====================================================
