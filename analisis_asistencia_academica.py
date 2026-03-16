@@ -161,12 +161,12 @@ elif menu == "📊 Panel Analítico":
         else:
             st.warning("Este estudiante no tiene asistencias registradas.")
             
-            fig_mes, ax_mes = plt.subplots(figsize=(6,4))
-            sns.lineplot(data=conteo_mensual, x="Año-Mes", y="Total", marker="o", ax=ax_mes)
-            plt.xticks(rotation=45)
-            ax_mes.set_xlabel("Año-Mes")
-            ax_mes.set_ylabel("Total mensual")
-            st.pyplot(fig_mes)
+        fig_mes, ax_mes = plt.subplots(figsize=(6,4))
+        sns.lineplot(data=conteo_mensual, x="Año-Mes", y="Total", marker="o", ax=ax_mes)
+        plt.xticks(rotation=45)
+        ax_mes.set_xlabel("Año-Mes")
+        ax_mes.set_ylabel("Total mensual")
+        st.pyplot(fig_mes)
 
             
 
