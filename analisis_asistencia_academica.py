@@ -72,8 +72,7 @@ if menu == "🏠 Inicio":
 # =====================================================
 
 
-
-    elif menu == "📊 Panel Analítico":
+elif menu == "📊 Panel Analítico":
 
     st.title("📊 Panel Analítico")
 
