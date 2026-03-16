@@ -152,16 +152,18 @@ elif menu == "📊 Panel Analítico":
     id_est = df[df["nombre"] == estudiante_sel]["id_estudiante"].values[0]
 
     conn = get_connection()
-    st.write(pd.read_sql("DESCRIBE asistencias", conn))
-    
-    asistencias_individual = pd.read_sql("""
+    cursor = conn.cursor()
+
+    query = """
     SELECT Fecha
     FROM asistencias
     WHERE Id_estudiante = %s
     ORDER BY Fecha
-    """, conn, params=(id_est,))
+"""
 
-    conn.close()
+    cursor.execute(query, (int(id_est),))
+    rows = cursor.fetchall()
+    asistencias_individual = pd.DataFrame(rows, columns=["Fecha"])
 
     # =========================
     # CONTEO POR MES (SOLO GRÁFICO)
