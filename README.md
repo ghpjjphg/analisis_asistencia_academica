@@ -21,4 +21,4 @@ Analizar patrones de asistencia estudiantil mediante consultas SQL y visualizaci
 
 ## 👨‍💻 Autor
 
-JUAN PABLO HENAO Y MARIA ANEGLA ARRIETA
+JUAN PABLO HENAO Y MARIA ANGELA ARRIETA
