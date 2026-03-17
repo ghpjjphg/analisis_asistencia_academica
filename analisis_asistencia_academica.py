@@ -56,7 +56,7 @@ menu = st.sidebar.radio(
 if menu == "🏠 Inicio":
 
     st.title("📊 Sistema de Análisis de Asistencia Académica")
-    st.subheader("Desarrollado por JUAN PABLO HENAO")
+    st.subheader("Desarrollado por JUAN PABLO HENAO Y MARIA ANEGLA ARRIETA")
 
     imagen = Image.open("ASISTENCIA.png")
     st.image(imagen, width=250)
