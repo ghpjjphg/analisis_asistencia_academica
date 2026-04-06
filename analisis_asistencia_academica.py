@@ -120,12 +120,13 @@ if menu == "🏠 Inicio":
     st.title("🎓 Sistema Inteligente de Alerta Temprana Académica")
     st.markdown("""
     Sistema integral que combina:
-    
+
     ✔ Análisis descriptivo avanzado  
     ✔ Score dinámico de riesgo  
     ✔ Clasificación estadística  
     ✔ Modelo predictivo de Machine Learning  
-    
+    ✔ Análisis estratégico por carrera  
+
     Diseñado como Early Warning System universitario.
     """)
 
@@ -223,3 +224,62 @@ elif menu == "🤖 Panel Predictivo":
     fig3, ax3 = plt.subplots()
     sns.histplot(probs, bins=15, kde=True, ax=ax3)
     st.pyplot(fig3)
+
+    # =====================================================
+    # RIESGO POR CARRERA
+    # =====================================================
+
+    st.divider()
+    st.subheader("🏫 Análisis Predictivo de Riesgo por Carrera")
+
+    df["prob_alto_riesgo"] = modelo.predict_proba(
+        df[["edad","total_asistencias"]]
+    )[:,1]
+
+    resumen_carrera = df.groupby("nombre_carrera").agg(
+        estudiantes=("nombre","count"),
+        promedio_probabilidad=("prob_alto_riesgo","mean"),
+        casos_alto_riesgo=("alto_riesgo","sum")
+    ).reset_index()
+
+    resumen_carrera["porcentaje_alto_riesgo"] = (
+        resumen_carrera["casos_alto_riesgo"] /
+        resumen_carrera["estudiantes"] * 100
+    )
+
+    resumen_carrera = resumen_carrera.sort_values(
+        "promedio_probabilidad",
+        ascending=False
+    )
+
+    carrera_critica = resumen_carrera.iloc[0]
+
+    colX, colY = st.columns(2)
+    colX.metric("🏆 Carrera con Mayor Riesgo",
+                carrera_critica["nombre_carrera"])
+    colY.metric("📉 Probabilidad Promedio",
+                f"{round(carrera_critica['promedio_probabilidad']*100,2)}%")
+
+    st.divider()
+
+    st.subheader("📊 Ranking de Riesgo por Carrera")
+
+    fig4, ax4 = plt.subplots(figsize=(8,5))
+    sns.barplot(
+        data=resumen_carrera,
+        x="promedio_probabilidad",
+        y="nombre_carrera",
+        ax=ax4
+    )
+    ax4.set_xlabel("Probabilidad Promedio de Alto Riesgo")
+    ax4.set_ylabel("Carrera")
+    st.pyplot(fig4)
+
+    st.divider()
+
+    st.subheader("📋 Resumen Estratégico por Carrera")
+
+    st.dataframe(
+        resumen_carrera,
+        use_container_width=True
+    )
