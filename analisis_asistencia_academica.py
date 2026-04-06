@@ -9,7 +9,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, accuracy_score
 
 st.set_page_config(
-    page_title="Sistema Predictivo de Riesgo Académico",
+    page_title="Sistema Inteligente de Riesgo Académico",
     layout="wide"
 )
 
@@ -45,11 +45,10 @@ def cargar_datos():
     return df
 
 # =====================================================
-# PREPARACIÓN DE RIESGO BASE
+# RISK SCORE DINÁMICO
 # =====================================================
 
-def preparar_datos(df):
-
+def calcular_risk_score(df):
     min_val = df["total_asistencias"].min()
     max_val = df["total_asistencias"].max()
 
@@ -57,11 +56,22 @@ def preparar_datos(df):
         (df["total_asistencias"] - min_val) /
         (max_val - min_val + 1e-5) * 100
     )
+    return df
 
+def clasificacion_percentil(df):
+    q1 = df["risk_score"].quantile(0.25)
     q3 = df["risk_score"].quantile(0.75)
 
-    df["alto_riesgo"] = (df["risk_score"] >= q3).astype(int)
+    def clasificar(score):
+        if score >= q3:
+            return "🔴 Alto Riesgo"
+        elif score >= q1:
+            return "🟡 Riesgo Medio"
+        else:
+            return "🟢 Bajo Riesgo"
 
+    df["nivel_riesgo"] = df["risk_score"].apply(clasificar)
+    df["alto_riesgo"] = (df["nivel_riesgo"]=="🔴 Alto Riesgo").astype(int)
     return df
 
 # =====================================================
@@ -94,43 +104,97 @@ def entrenar_modelo(df):
 
 menu = st.sidebar.radio(
     "Navegación",
-    ["📊 Dashboard Predictivo"]
+    ["🏠 Inicio", "📊 Panel Analítico Experto", "🤖 Panel Predictivo"]
 )
 
+if st.sidebar.button("🔄 Recargar Datos"):
+    st.cache_data.clear()
+    st.cache_resource.clear()
+
 # =====================================================
-# DASHBOARD
+# INICIO
 # =====================================================
 
-if menu == "📊 Dashboard Predictivo":
+if menu == "🏠 Inicio":
 
-    st.title("🤖 Sistema Predictivo de Riesgo Académico")
+    st.title("🎓 Sistema Inteligente de Alerta Temprana Académica")
+    st.markdown("""
+    Sistema integral que combina:
+    
+    ✔ Análisis descriptivo avanzado  
+    ✔ Score dinámico de riesgo  
+    ✔ Clasificación estadística  
+    ✔ Modelo predictivo de Machine Learning  
+    
+    Diseñado como Early Warning System universitario.
+    """)
+
+# =====================================================
+# PANEL ANALÍTICO EXPERTO
+# =====================================================
+
+elif menu == "📊 Panel Analítico Experto":
+
+    st.title("📊 Panel Analítico de Riesgo")
 
     df = cargar_datos()
-    df = preparar_datos(df)
+    df = calcular_risk_score(df)
+    df = clasificacion_percentil(df)
 
-    modelo, acc, matriz = entrenar_modelo(df)
+    col1, col2, col3 = st.columns(3)
 
-    # ================= KPIs =================
-
-    col1, col2 = st.columns(2)
-    col1.metric("🎯 Precisión del Modelo", f"{round(acc*100,2)}%")
-    col2.metric("👥 Total Estudiantes", df.shape[0])
+    col1.metric("👥 Total Estudiantes", df.shape[0])
+    col2.metric("📊 Asistencia Promedio", round(df["total_asistencias"].mean(),1))
+    col3.metric("🚨 Alto Riesgo", df["alto_riesgo"].sum())
 
     st.divider()
 
-    # ================= MATRIZ DE CONFUSIÓN =================
+    st.subheader("📈 Distribución del Risk Score")
 
-    st.subheader("📊 Matriz de Confusión")
-
-    fig1, ax1 = plt.subplots()
-    sns.heatmap(matriz, annot=True, fmt="d", cmap="Blues", ax=ax1)
-    ax1.set_xlabel("Predicción")
-    ax1.set_ylabel("Real")
+    fig1, ax1 = plt.subplots(figsize=(7,4))
+    sns.histplot(df["risk_score"], bins=15, kde=True, ax=ax1)
     st.pyplot(fig1)
 
     st.divider()
 
-    # ================= PROBABILIDAD INDIVIDUAL =================
+    st.subheader("🏆 Ranking Estratégico")
+
+    ranking = df.sort_values("risk_score", ascending=False)
+
+    st.dataframe(
+        ranking[["nombre","nombre_carrera","total_asistencias","risk_score","nivel_riesgo"]],
+        use_container_width=True
+    )
+
+# =====================================================
+# PANEL PREDICTIVO
+# =====================================================
+
+elif menu == "🤖 Panel Predictivo":
+
+    st.title("🤖 Modelo Predictivo de Alto Riesgo")
+
+    df = cargar_datos()
+    df = calcular_risk_score(df)
+    df = clasificacion_percentil(df)
+
+    modelo, acc, matriz = entrenar_modelo(df)
+
+    col1, col2 = st.columns(2)
+    col1.metric("🎯 Precisión del Modelo", f"{round(acc*100,2)}%")
+    col2.metric("⚠️ Casos Alto Riesgo", df["alto_riesgo"].sum())
+
+    st.divider()
+
+    st.subheader("📊 Matriz de Confusión")
+
+    fig2, ax2 = plt.subplots()
+    sns.heatmap(matriz, annot=True, fmt="d", cmap="Blues", ax=ax2)
+    ax2.set_xlabel("Predicción")
+    ax2.set_ylabel("Real")
+    st.pyplot(fig2)
+
+    st.divider()
 
     st.subheader("🔮 Predicción Individual")
 
@@ -139,25 +203,23 @@ if menu == "📊 Dashboard Predictivo":
         df["nombre"]
     )
 
-    estudiante = df[df["nombre"] == estudiante_sel]
+    estudiante = df[df["nombre"]==estudiante_sel]
 
-    X_ind = estudiante[["edad", "total_asistencias"]]
+    X_ind = estudiante[["edad","total_asistencias"]]
     prob = modelo.predict_proba(X_ind)[0][1]
 
-    riesgo_label = "🔴 Alto Riesgo" if prob >= 0.5 else "🟢 Bajo/Medio Riesgo"
+    label = "🔴 Alto Riesgo" if prob>=0.5 else "🟢 Bajo/Medio"
 
     colA, colB = st.columns(2)
-    colA.metric("Probabilidad de Alto Riesgo", f"{round(prob*100,2)}%")
-    colB.metric("Clasificación Predicha", riesgo_label)
+    colA.metric("Probabilidad Alto Riesgo", f"{round(prob*100,2)}%")
+    colB.metric("Clasificación Predicha", label)
 
     st.divider()
-
-    # ================= DISTRIBUCIÓN =================
 
     st.subheader("📈 Distribución de Probabilidades")
 
     probs = modelo.predict_proba(df[["edad","total_asistencias"]])[:,1]
 
-    fig2, ax2 = plt.subplots()
-    sns.histplot(probs, bins=15, kde=True, ax=ax2)
-    st.pyplot(fig2)
+    fig3, ax3 = plt.subplots()
+    sns.histplot(probs, bins=15, kde=True, ax=ax3)
+    st.pyplot(fig3)
