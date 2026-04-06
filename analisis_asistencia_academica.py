@@ -2,28 +2,16 @@ import streamlit as st
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from PIL import Image
+import numpy as np
 from database.connection import get_connection
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix, accuracy_score
 
 st.set_page_config(
-    page_title="Sistema Experto de Alerta Temprana Académica",
+    page_title="Sistema Predictivo de Riesgo Académico",
     layout="wide"
 )
-
-# =====================================================
-# ESTILOS PRO
-# =====================================================
-
-st.markdown("""
-<style>
-.stMetric {
-    background-color: #FFFFFF;
-    padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
-}
-</style>
-""", unsafe_allow_html=True)
 
 # =====================================================
 # CARGA DE DATOS
@@ -57,10 +45,11 @@ def cargar_datos():
     return df
 
 # =====================================================
-# FUNCIÓN DE SCORE INTELIGENTE
+# PREPARACIÓN DE RIESGO BASE
 # =====================================================
 
-def calcular_risk_score(df):
+def preparar_datos(df):
+
     min_val = df["total_asistencias"].min()
     max_val = df["total_asistencias"].max()
 
@@ -69,22 +58,35 @@ def calcular_risk_score(df):
         (max_val - min_val + 1e-5) * 100
     )
 
-    return df
-
-def clasificacion_percentil(df):
-    q1 = df["risk_score"].quantile(0.25)
     q3 = df["risk_score"].quantile(0.75)
 
-    def clasificar(score):
-        if score >= q3:
-            return "🔴 Alto Riesgo"
-        elif score >= q1:
-            return "🟡 Riesgo Medio"
-        else:
-            return "🟢 Bajo Riesgo"
+    df["alto_riesgo"] = (df["risk_score"] >= q3).astype(int)
 
-    df["nivel_riesgo"] = df["risk_score"].apply(clasificar)
     return df
+
+# =====================================================
+# MODELO PREDICTIVO
+# =====================================================
+
+@st.cache_resource
+def entrenar_modelo(df):
+
+    X = df[["edad", "total_asistencias"]]
+    y = df["alto_riesgo"]
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.3, random_state=42
+    )
+
+    modelo = LogisticRegression()
+    modelo.fit(X_train, y_train)
+
+    y_pred = modelo.predict(X_test)
+
+    acc = accuracy_score(y_test, y_pred)
+    matriz = confusion_matrix(y_test, y_pred)
+
+    return modelo, acc, matriz
 
 # =====================================================
 # MENÚ
@@ -92,83 +94,70 @@ def clasificacion_percentil(df):
 
 menu = st.sidebar.radio(
     "Navegación",
-    ["🏠 Inicio", "📊 Sistema Experto"]
+    ["📊 Dashboard Predictivo"]
 )
 
-if st.sidebar.button("🔄 Recargar Datos"):
-    st.cache_data.clear()
-
 # =====================================================
-# INICIO
+# DASHBOARD
 # =====================================================
 
-if menu == "🏠 Inicio":
+if menu == "📊 Dashboard Predictivo":
 
-    st.title("🎓 Sistema Experto de Alerta Temprana Académica")
-    st.markdown("""
-    Sistema inteligente basado en análisis estadístico y normalización.
-    Permite detectar estudiantes en riesgo usando percentiles dinámicos.
-    """)
-
-# =====================================================
-# SISTEMA EXPERTO
-# =====================================================
-
-elif menu == "📊 Sistema Experto":
-
-    st.title("📊 Panel Inteligente de Riesgo")
+    st.title("🤖 Sistema Predictivo de Riesgo Académico")
 
     df = cargar_datos()
-    df = calcular_risk_score(df)
-    df = clasificacion_percentil(df)
+    df = preparar_datos(df)
+
+    modelo, acc, matriz = entrenar_modelo(df)
 
     # ================= KPIs =================
 
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2 = st.columns(2)
+    col1.metric("🎯 Precisión del Modelo", f"{round(acc*100,2)}%")
+    col2.metric("👥 Total Estudiantes", df.shape[0])
 
-    col1.metric("👥 Total Estudiantes", df.shape[0])
-    col2.metric("📊 Asistencia Promedio", round(df["total_asistencias"].mean(),1))
-    col3.metric("⚠️ Promedio Risk Score", round(df["risk_score"].mean(),1))
+    st.divider()
 
-    alto = df[df["nivel_riesgo"]=="🔴 Alto Riesgo"].shape[0]
-    col4.metric("🚨 Estudiantes Alto Riesgo", alto)
+    # ================= MATRIZ DE CONFUSIÓN =================
+
+    st.subheader("📊 Matriz de Confusión")
+
+    fig1, ax1 = plt.subplots()
+    sns.heatmap(matriz, annot=True, fmt="d", cmap="Blues", ax=ax1)
+    ax1.set_xlabel("Predicción")
+    ax1.set_ylabel("Real")
+    st.pyplot(fig1)
+
+    st.divider()
+
+    # ================= PROBABILIDAD INDIVIDUAL =================
+
+    st.subheader("🔮 Predicción Individual")
+
+    estudiante_sel = st.selectbox(
+        "Selecciona un estudiante",
+        df["nombre"]
+    )
+
+    estudiante = df[df["nombre"] == estudiante_sel]
+
+    X_ind = estudiante[["edad", "total_asistencias"]]
+    prob = modelo.predict_proba(X_ind)[0][1]
+
+    riesgo_label = "🔴 Alto Riesgo" if prob >= 0.5 else "🟢 Bajo/Medio Riesgo"
+
+    colA, colB = st.columns(2)
+    colA.metric("Probabilidad de Alto Riesgo", f"{round(prob*100,2)}%")
+    colB.metric("Clasificación Predicha", riesgo_label)
 
     st.divider()
 
     # ================= DISTRIBUCIÓN =================
 
-    st.subheader("📈 Distribución del Risk Score")
+    st.subheader("📈 Distribución de Probabilidades")
 
-    fig1, ax1 = plt.subplots(figsize=(7,4))
-    sns.histplot(df["risk_score"], bins=15, kde=True, ax=ax1)
-    st.pyplot(fig1)
+    probs = modelo.predict_proba(df[["edad","total_asistencias"]])[:,1]
 
-    st.divider()
-
-    # ================= RANKING =================
-
-    st.subheader("🏆 Ranking Estratégico de Riesgo")
-
-    ranking = df.sort_values("risk_score", ascending=False)
-
-    st.dataframe(
-        ranking[["nombre", "nombre_carrera", "total_asistencias", "risk_score", "nivel_riesgo"]],
-        use_container_width=True
-    )
-
-    st.divider()
-
-    # ================= EXPORTACIÓN =================
-
-    st.subheader("📤 Exportar Alto Riesgo")
-
-    alto_riesgo_df = df[df["nivel_riesgo"]=="🔴 Alto Riesgo"]
-
-    csv = alto_riesgo_df.to_csv(index=False).encode('utf-8')
-
-    st.download_button(
-        label="Descargar lista de Alto Riesgo",
-        data=csv,
-        file_name='estudiantes_alto_riesgo.csv',
-        mime='text/csv'
-    )
+    fig2, ax2 = plt.subplots()
+    sns.histplot(probs, bins=15, kde=True, ax=ax2)
+    st.pyplot(fig2)
