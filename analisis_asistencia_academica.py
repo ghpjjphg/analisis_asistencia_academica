@@ -136,34 +136,119 @@ if menu == "🏠 Inicio":
 
 elif menu == "📊 Panel Analítico Experto":
 
-    st.title("📊 Panel Analítico de Riesgo")
+    st.title("📊 Panel Analítico Estadístico Profesional")
 
     df = cargar_datos()
     df = calcular_risk_score(df)
     df = clasificacion_percentil(df)
 
+    # =====================================================
+    # KPIs BÁSICOS
+    # =====================================================
+
     col1, col2, col3 = st.columns(3)
 
     col1.metric("👥 Total Estudiantes", df.shape[0])
-    col2.metric("📊 Asistencia Promedio", round(df["total_asistencias"].mean(),1))
-    col3.metric("🚨 Alto Riesgo", df["alto_riesgo"].sum())
+    col2.metric("📊 Asistencia Promedio", round(df["total_asistencias"].mean(),2))
+    col3.metric("🚨 Casos Alto Riesgo", df["alto_riesgo"].sum())
 
     st.divider()
 
-    st.subheader("📈 Distribución del Risk Score")
+    # =====================================================
+    # ESTADÍSTICOS DESCRIPTIVOS PROFESIONALES
+    # =====================================================
 
-    fig1, ax1 = plt.subplots(figsize=(7,4))
-    sns.histplot(df["risk_score"], bins=15, kde=True, ax=ax1)
+    st.subheader("📈 Estadísticos Descriptivos")
+
+    media = df["total_asistencias"].mean()
+    mediana = df["total_asistencias"].median()
+    std = df["total_asistencias"].std()
+    varianza = df["total_asistencias"].var()
+    q1 = df["total_asistencias"].quantile(0.25)
+    q3 = df["total_asistencias"].quantile(0.75)
+    coef_var = std / media if media != 0 else 0
+
+    colA, colB, colC = st.columns(3)
+    colA.metric("Media", round(media,2))
+    colB.metric("Mediana", round(mediana,2))
+    colC.metric("Desviación Estándar", round(std,2))
+
+    colD, colE, colF = st.columns(3)
+    colD.metric("Varianza", round(varianza,2))
+    colE.metric("Q1 (25%)", round(q1,2))
+    colF.metric("Q3 (75%)", round(q3,2))
+
+    st.metric("Coeficiente de Variación", round(coef_var,2))
+
+    st.divider()
+
+    # =====================================================
+    # HISTOGRAMA + CAMPANA DE GAUSS
+    # =====================================================
+
+    st.subheader("📊 Distribución con Campana de Gauss")
+
+    datos = df["total_asistencias"]
+
+    fig1, ax1 = plt.subplots(figsize=(8,5))
+    sns.histplot(datos, bins=15, stat="density", kde=False, ax=ax1)
+
+    # Curva normal
+    x = np.linspace(datos.min(), datos.max(), 100)
+    y = (1 / (std * np.sqrt(2 * np.pi))) * np.exp(-0.5 * ((x - media) / std)**2)
+
+    ax1.plot(x, y, linewidth=3)
+    ax1.set_title("Distribución de Asistencias con Curva Normal")
     st.pyplot(fig1)
 
     st.divider()
 
-    st.subheader("🏆 Ranking Estratégico")
+    # =====================================================
+    # BOXPLOT PROFESIONAL
+    # =====================================================
 
-    ranking = df.sort_values("risk_score", ascending=False)
+    st.subheader("📦 Análisis de Outliers (Boxplot)")
+
+    fig2, ax2 = plt.subplots(figsize=(6,4))
+    sns.boxplot(x=df["total_asistencias"], ax=ax2)
+    st.pyplot(fig2)
+
+    st.divider()
+
+    # =====================================================
+    # INTERPRETACIÓN AUTOMÁTICA
+    # =====================================================
+
+    st.subheader("🧠 Interpretación Estadística Automática")
+
+    interpretacion = ""
+
+    if abs(media - mediana) < 1:
+        interpretacion += "La distribución es aproximadamente simétrica.\n\n"
+    elif media > mediana:
+        interpretacion += "La distribución presenta sesgo positivo (cola hacia la derecha).\n\n"
+    else:
+        interpretacion += "La distribución presenta sesgo negativo (cola hacia la izquierda).\n\n"
+
+    if coef_var < 0.3:
+        interpretacion += "La variabilidad es baja (datos homogéneos).\n\n"
+    elif coef_var < 0.6:
+        interpretacion += "La variabilidad es moderada.\n\n"
+    else:
+        interpretacion += "Existe alta dispersión en los datos.\n\n"
+
+    st.info(interpretacion)
+
+    st.divider()
+
+    # =====================================================
+    # TABLA DETALLADA
+    # =====================================================
+
+    st.subheader("📋 Tabla Detallada")
 
     st.dataframe(
-        ranking[["nombre","nombre_carrera","total_asistencias","risk_score","nivel_riesgo"]],
+        df[["nombre","nombre_carrera","total_asistencias","risk_score","nivel_riesgo"]],
         use_container_width=True
     )
 
