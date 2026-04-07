@@ -117,19 +117,81 @@ if st.sidebar.button("🔄 Recargar Datos"):
 
 if menu == "🏠 Inicio":
 
-    st.title("🎓 Sistema Inteligente de Alerta Temprana Académica")
-    st.markdown("""
-    Sistema integral que combina:
+```
+# HERO SECTION
+st.markdown("""
+<h1 style='text-align: center; font-size: 3em;'>
+🎓 Sistema Inteligente de Riesgo Académico
+</h1>
+<p style='text-align: center; font-size: 1.2em;'>
+Plataforma basada en análisis de datos y Machine Learning para la detección temprana del riesgo académico.
+</p>
+""", unsafe_allow_html=True)
 
-    ✔ Análisis descriptivo avanzado  
-    ✔ Score dinámico de riesgo  
-    ✔ Clasificación estadística  
-    ✔ Modelo predictivo de Machine Learning  
-    ✔ Análisis estratégico por carrera  
+st.divider()
 
-    Diseñado como Early Warning System universitario.
-    """)
+# BENEFICIOS
+col1, col2, col3 = st.columns(3)
 
+col1.markdown("""
+### 📊 Analítica Avanzada
+- Estadísticos descriptivos
+- Distribución de datos
+- Detección de outliers
+""")
+
+col2.markdown("""
+### 🤖 Machine Learning
+- Modelo predictivo
+- Clasificación automática
+- Probabilidad de riesgo
+""")
+
+col3.markdown("""
+### 🎯 Toma de Decisiones
+- Identificación de estudiantes críticos
+- Análisis por carrera
+- Soporte estratégico
+""")
+
+st.divider()
+
+# SECCIÓN VISUAL / KPIs
+st.subheader("📌 ¿Qué hace este sistema?")
+
+st.markdown("""
+Este sistema permite a instituciones educativas:
+
+✔ Detectar estudiantes en riesgo académico  
+✔ Analizar patrones de asistencia  
+✔ Aplicar modelos predictivos  
+✔ Generar alertas tempranas  
+
+Todo en una sola plataforma interactiva.
+""")
+
+st.divider()
+
+# FLUJO DEL SISTEMA
+st.subheader("⚙️ ¿Cómo funciona?")
+
+st.markdown("""
+1️⃣ Recolección de datos académicos  
+2️⃣ Análisis estadístico descriptivo  
+3️⃣ Cálculo de score de riesgo  
+4️⃣ Clasificación por percentiles  
+5️⃣ Predicción con Machine Learning  
+""")
+
+st.divider()
+
+# CALL TO ACTION
+st.markdown("""
+<h3 style='text-align: center;'>
+🚀 Explora el sistema en el menú lateral
+</h3>
+""", unsafe_allow_html=True)
+```
 # =====================================================
 # PANEL ANALÍTICO EXPERTO
 # =====================================================
