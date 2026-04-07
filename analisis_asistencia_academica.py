@@ -117,7 +117,6 @@ if st.sidebar.button("🔄 Recargar Datos"):
 
 if menu == "🏠 Inicio":
 
-    ```
     # HERO SECTION
     st.markdown("""
     <h1 style='text-align: center; font-size: 3em;'>
@@ -191,7 +190,6 @@ if menu == "🏠 Inicio":
     🚀 Explora el sistema en el menú lateral
     </h3>
     """, unsafe_allow_html=True)
-    ```
 
 # =====================================================
 # PANEL ANALÍTICO EXPERTO
