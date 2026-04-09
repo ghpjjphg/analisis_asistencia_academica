@@ -112,82 +112,85 @@ if st.sidebar.button("🔄 Recargar Datos"):
     st.cache_resource.clear()
 
 # =====================================================
-# INICIO
+# INICIO (MEJORADO 🚀)
 # =====================================================
 
 if menu == "🏠 Inicio":
 
-    # HERO SECTION
     st.markdown("""
     <h1 style='text-align: center; font-size: 3em;'>
-    🎓 Sistema Inteligente de Riesgo Académico
+    🎓 Sistema Inteligente de Riesgo Académico y Deserción
     </h1>
+
     <p style='text-align: center; font-size: 1.2em;'>
-    Plataforma basada en análisis de datos y Machine Learning para la detección temprana del riesgo académico.
+    Plataforma avanzada que integra <b>Analítica de Datos, Machine Learning y Visualización Interactiva</b> 
+    para la detección temprana del riesgo académico.
     </p>
     """, unsafe_allow_html=True)
-    
+
     st.divider()
-    
-    # BENEFICIOS
+
     col1, col2, col3 = st.columns(3)
-    
+
     col1.markdown("""
     ### 📊 Analítica Avanzada
+    - Análisis Exploratorio (EDA)
     - Estadísticos descriptivos
-    - Distribución de datos
-    - Detección de outliers
+    - Detección de patrones
     """)
-    
+
     col2.markdown("""
     ### 🤖 Machine Learning
-    - Modelo predictivo
-    - Clasificación automática
-    - Probabilidad de riesgo
+    - Regresión Logística
+    - Predicción de riesgo
+    - Probabilidad en tiempo real
     """)
-    
+
     col3.markdown("""
     ### 🎯 Toma de Decisiones
     - Identificación de estudiantes críticos
     - Análisis por carrera
     - Soporte estratégico
     """)
-    
+
     st.divider()
-    
-    # SECCIÓN VISUAL / KPIs
+
     st.subheader("📌 ¿Qué hace este sistema?")
-    
+
     st.markdown("""
-    Este sistema permite a instituciones educativas:
-    
-    ✔ Detectar estudiantes en riesgo académico  
-    ✔ Analizar patrones de asistencia  
-    ✔ Aplicar modelos predictivos  
-    ✔ Generar alertas tempranas  
-    
-    Todo en una sola plataforma interactiva.
+    ✔ Detecta estudiantes en riesgo académico  
+    ✔ Analiza asistencia y rendimiento  
+    ✔ Aplica modelos predictivos  
+    ✔ Genera información estratégica  
     """)
-    
+
     st.divider()
-    
-    # FLUJO DEL SISTEMA
+
     st.subheader("⚙️ ¿Cómo funciona?")
-    
+
     st.markdown("""
-    1️⃣ Recolección de datos académicos  
-    2️⃣ Análisis estadístico descriptivo  
-    3️⃣ Cálculo de score de riesgo  
-    4️⃣ Clasificación por percentiles  
+    1️⃣ Recolección de datos  
+    2️⃣ Análisis exploratorio  
+    3️⃣ Cálculo de risk score  
+    4️⃣ Clasificación de riesgo  
     5️⃣ Predicción con Machine Learning  
     """)
-    
+
     st.divider()
-    
-    # CALL TO ACTION
+
+    st.subheader("👥 Integrantes")
+
+    colA, colB, colC = st.columns(3)
+
+    colA.markdown("**Juan Pablo Henao**  \nData Analyst")
+    colB.markdown("**María Ángela Arrieta**  \nData Scientist")
+    colC.markdown("**Javier Rivera Vielmas**  \nData Engineer")
+
+    st.divider()
+
     st.markdown("""
     <h3 style='text-align: center;'>
-    🚀 Explora el sistema en el menú lateral
+    🚀 Explora el sistema desde el menú lateral
     </h3>
     """, unsafe_allow_html=True)
 
