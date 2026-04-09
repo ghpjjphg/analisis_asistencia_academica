@@ -212,7 +212,7 @@ if menu == "🏠 Inicio":
 
 elif menu == "📊 Panel Analítico":
 
-    st.title("📊 Panel Analítico Estadístico Profesional")
+    st.title("📊 Panel Analítico Estadístico")
 
     df = cargar_datos()
     df = calcular_risk_score(df)
