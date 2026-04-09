@@ -182,9 +182,21 @@ if menu == "🏠 Inicio":
 
     colA, colB, colC = st.columns(3)
 
-    colA.markdown("**Juan Pablo Henao**  \nData Analyst")
-    colB.markdown("**María Ángela Arrieta**  \nData Scientist")
-    colC.markdown("**Javier Rivera Vielmas**  \nData Engineer")
+    colA.markdown("**Juan Pablo Henao**")
+    colB.markdown("**María Ángela Arrieta**")
+    colC.markdown("**Javier Rivera Vielmas**")
+    st.divider()
+
+    st.subheader("📓 Notebook del Proyecto")
+    
+    st.markdown("""
+    Accede al análisis completo (EDA, generación de datos y modelo predictivo) desarrollado en Google Colab.
+    """)
+    
+    st.link_button(
+        "🚀 Abrir Cuaderno en Colab",
+        "https://colab.research.google.com/drive/1o5IyGvpxgEmbH5ltBxay88vK9xyCr4X8?usp=sharing"
+    )
 
     st.divider()
 
