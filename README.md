@@ -86,4 +86,10 @@ El sistema sigue este flujo:
 - Seaborn  
 - Matplotlib  
 - Scikit-learn  
-- MySQL  
+- MySQL
+
+  ## 👥 Autores
+
+- 👨‍💻 **Juan Pablo Henao**  
+- 👩‍💻 **María Ángela Arrieta**  
+- 👨‍💻 **Javier Rivera Vielmas**
