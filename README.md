@@ -87,7 +87,3 @@ El sistema sigue este flujo:
 - Matplotlib  
 - Scikit-learn  
 - MySQL  
-
----
-
-## 🗄️ Estructura del Proyecto
