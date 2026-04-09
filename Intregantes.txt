@@ -1,5 +1,6 @@
---------------------------
-------Integrantes---------
-- 1. Juan Pablo Henao ----
-- 2. Maria Angela Arrieta-
---------------------------
+---------------------------
+------Integrantes----------
+- 1. Juan Pablo Henao -----
+- 2. Maria Angela Arrieta--
+- 3. Javier Rivera Vielmas-
+---------------------------
