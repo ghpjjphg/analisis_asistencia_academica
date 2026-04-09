@@ -104,7 +104,7 @@ def entrenar_modelo(df):
 
 menu = st.sidebar.radio(
     "Navegación",
-    ["🏠 Inicio", "📊 Panel Analítico Experto", "🤖 Panel Predictivo"]
+    ["🏠 Inicio", "📊 Panel Analítico", "🤖 Panel Predictivo"]
 )
 
 if st.sidebar.button("🔄 Recargar Datos"):
@@ -207,10 +207,10 @@ if menu == "🏠 Inicio":
     """, unsafe_allow_html=True)
 
 # =====================================================
-# PANEL ANALÍTICO EXPERTO
+# PANEL ANALÍTICO
 # =====================================================
 
-elif menu == "📊 Panel Analítico Experto":
+elif menu == "📊 Panel Analítico":
 
     st.title("📊 Panel Analítico Estadístico Profesional")
 
