@@ -16,6 +16,27 @@ Proyecto integral desarrollado para **Talento Tech**, que combina:
 
 ---
 
+## 📚 Marco Teórico
+
+El desarrollo de este sistema se fundamenta en tres pilares conceptuales que permiten transformar datos crudos en estrategias de retención estudiantil:
+
+### 1. Deserción Estudiantil y Factores de Riesgo
+La deserción se entiende como el abandono prematuro del programa académico. Según modelos clásicos como el de **Vincent Tinto**, este fenómeno es multicausal y se divide en cuatro dimensiones que este proyecto busca cuantificar:
+* **Dimensión Académica:** Relacionada con el rendimiento (promedios) y el cumplimiento de requisitos.
+* **Dimensión Social/Comportamental:** La integración del estudiante, reflejada en su asistencia y uso de plataformas digitales.
+* **Dimensión Socioeconómica:** El impacto del estrato y el apoyo familiar en la continuidad de los estudios.
+* **Dimensión Individual:** Variables demográficas como edad, género y ciudad de origen.
+
+### 2. Analítica de Aprendizaje (Learning Analytics)
+Este proyecto aplica técnicas de *Learning Analytics* para medir, recopilar y analizar datos sobre los alumnos y sus contextos. El objetivo no es solo describir qué pasó (análisis descriptivo), sino utilizar el **Análisis Predictivo** para identificar patrones ocultos que preceden al abandono, permitiendo una intervención temprana.
+
+### 3. Regresión Logística en Contextos Educativos
+Para la predicción, se utiliza el modelo de **Regresión Logística**. Este algoritmo es ideal para problemas de clasificación binaria (deserta / no deserta) porque:
+* Permite calcular la **probabilidad** de ocurrencia del evento.
+* Ofrece **interpretabilidad**, permitiendo identificar qué variables (como la inasistencia) tienen mayor peso o influencia en el riesgo académico.
+
+---
+
 ## 🎯 Objetivo del Proyecto
 
 Desarrollar un sistema inteligente capaz de:
